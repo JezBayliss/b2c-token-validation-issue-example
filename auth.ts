@@ -1,73 +1,31 @@
 import NextAuth from "next-auth"
 
-import Apple from "next-auth/providers/apple"
-import Auth0 from "next-auth/providers/auth0"
 import AzureB2C from "next-auth/providers/azure-ad-b2c"
-import BoxyHQSAML from "next-auth/providers/boxyhq-saml"
-import Cognito from "next-auth/providers/cognito"
-import Coinbase from "next-auth/providers/coinbase"
-import Discord from "next-auth/providers/discord"
-import Dropbox from "next-auth/providers/dropbox"
-import Facebook from "next-auth/providers/facebook"
-import GitHub from "next-auth/providers/github"
-import Gitlab from "next-auth/providers/gitlab"
-import Google from "next-auth/providers/google"
-import Hubspot from "next-auth/providers/hubspot"
-import Keycloak from "next-auth/providers/keycloak"
-import LinkedIn from "next-auth/providers/linkedin"
-import Netlify from "next-auth/providers/netlify"
-import Okta from "next-auth/providers/okta"
-import Passage from "next-auth/providers/passage"
-import Pinterest from "next-auth/providers/pinterest"
-import Reddit from "next-auth/providers/reddit"
-import Slack from "next-auth/providers/slack"
-import Spotify from "next-auth/providers/spotify"
-import Twitch from "next-auth/providers/twitch"
-import Twitter from "next-auth/providers/twitter"
-import WorkOS from "next-auth/providers/workos"
-import Zoom from "next-auth/providers/zoom"
 
 import type { NextAuthConfig } from "next-auth"
+
+const B2C_TENANT_ID = process.env.AUTH_AZURE_AD_B2C_TENANT
+const B2C_TENANT_NAME = "<tenant_name>"
+const B2C_CLIENT_ID = process.env.AUTH_AZURE_AD_B2C_ID
+const B2C_POLICY = "<policy>"
+const B2C_CLIENT_SECRET = process.env.AUTH_AZURE_AD_B2C_SECRET
 
 export const config = {
   theme: { logo: "https://authjs.dev/img/logo-sm.png" },
   providers: [
-    Apple,
-    Auth0,
+    // I have this config working for my real world project. Simply replace with a working B2C application details
     AzureB2C({
-      clientId: process.env.AUTH_AZURE_AD_B2C_ID,
-      clientSecret: process.env.AUTH_AZURE_AD_B2C_SECRET,
-      issuer: process.env.AUTH_AZURE_AD_B2C_ISSUER,
+      id: "test-b2c",
+      issuer: `https://${B2C_TENANT_NAME}.b2clogin.com/${B2C_TENANT_ID}/v2.0/`,
+      wellKnown: `https://${B2C_TENANT_NAME}.b2clogin.com/${B2C_TENANT_NAME}.onmicrosoft.com/${B2C_POLICY}/v2.0/.well-known/openid-configuration`,
+      authorization: {
+        url: `https://${B2C_TENANT_NAME}.b2clogin.com/${B2C_TENANT_NAME}.onmicrosoft.com/${B2C_POLICY}/oauth2/v2.0/authorize`,
+        params: { scope: B2C_CLIENT_ID },
+      },
+      token: `https://${B2C_TENANT_NAME}.b2clogin.com/${B2C_TENANT_NAME}.onmicrosoft.com/${B2C_POLICY}/oauth2/v2.0/token`,
+      clientId: B2C_CLIENT_ID,
+      clientSecret: B2C_CLIENT_SECRET,
     }),
-    BoxyHQSAML({
-      clientId: "dummy",
-      clientSecret: "dummy",
-      issuer: process.env.AUTH_BOXYHQ_SAML_ISSUER,
-    }),
-    Cognito,
-    Coinbase,
-    Discord,
-    Dropbox,
-    Facebook,
-    GitHub,
-    Gitlab,
-    Google,
-    Hubspot,
-    Keycloak,
-    LinkedIn,
-    Netlify,
-    Okta,
-    Passage,
-    Pinterest,
-    Reddit,
-    Slack,
-    Spotify,
-    Twitch,
-    Twitter,
-    WorkOS({
-      connection: process.env.AUTH_WORKOS_CONNECTION,
-    }),
-    Zoom,
   ],
   basePath: "/auth",
   callbacks: {
